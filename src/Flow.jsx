@@ -1,33 +1,34 @@
 import { ReactFlow, Controls, Background,applyEdgeChanges, applyNodeChanges,addEdge } from '@xyflow/react';
-import { useCallback,  useState } from 'react';
+import { useCallback,  useState, useEffect } from 'react';
 import '@xyflow/react/dist/style.css';
 
-const initialNodes = [
-  {
-    id: '1',
-    position: { x: 0, y: 0 },
-    data: { label: 'Hello' },
-    type: 'input',
-  },
-  {
-    id: '2',
-    position: { x: 100, y: 100 },
-    data: { label: 'World' },
-  },
-  
-  {
-    id: '3',
-    position: { x: 300, y: 200 },
-    data: { label: 'of sport' },
-  },
-];
+const initialNodes = [];
 
-const initialEdges = [{ id: '1-2', source: '1', target: '2' ,  label: 'to the'},{ id: '1-3', source: '1', target: '3' ,  label: 'to the'}];
-// const initialEdges = [];
+const initialEdges = [];
 
-export default function Flow() {
+export default function Flow() {  
+
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
+
+  useEffect(() => {
+    console.log("Use effect called");
+    fetch('http://localhost:5146/api/Graph')
+      .then(function(response) {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        var data = response.json();
+        console.log(data);
+        return data;
+      })
+      .then(function(json){
+        console.log(json);
+        setNodes(json.nodes);
+        
+      })
+      .catch(error => console.error(error));      
+  }, []);
 
   const onNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
